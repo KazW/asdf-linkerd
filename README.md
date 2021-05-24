@@ -1,4 +1,4 @@
-# asdf-linkerd ![Build](https://github.com/KazW/asdf-linkerd/workflows/Build/badge.svg) ![Lint](https://github.com/KazW/asdf-linkerd/workflows/Lint/badge.svg)
+# asdf-linkerd [![Build](https://github.com/KazW/asdf-linkerd/workflows/Build/badge.svg)](https://github.com/KazW/asdf-linkerd/actions/workflows/build.yml) [![Lint](https://github.com/KazW/asdf-linkerd/workflows/Lint/badge.svg)](https://github.com/KazW/asdf-linkerd/actions/workflows/lint.yml)
 
 [linkerd](https://linkerd.io/2.10/reference/cli/) plugin for the [asdf version manager](https://asdf-vm.com).
 Based on [this plugin](https://github.com/vaynerx/asdf-linkerd).
