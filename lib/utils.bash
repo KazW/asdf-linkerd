@@ -32,11 +32,11 @@ list_all_versions() {
   list_github_tags
 }
 
-get_platform () {
+get_platform() {
   local platform="$(uname | tr '[:upper:]' '[:lower:]')"
 
   case "$platform" in
-    linux|darwin|freebsd) ;;
+    linux | darwin | freebsd) ;;
     *)
       fail "Platform '${platform}' not supported!"
       ;;
@@ -45,15 +45,15 @@ get_platform () {
   echo -n ${platform}
 }
 
-get_arch () {
+get_arch() {
   local arch=""
 
   case "$(uname -m)" in
-    x86_64|amd64) arch="amd64"; ;;
-    i686|i386) arch="386"; ;;
-    armv6l|armv7l) arch="armv6l"; ;;
-    aarch64|arm64) arch="arm64"; ;;
-    ppc64le) arch="ppc64le"; ;;
+    x86_64 | amd64) arch="amd64" ;;
+    i686 | i386) arch="386" ;;
+    armv6l | armv7l) arch="armv6l" ;;
+    aarch64 | arm64) arch="arm64" ;;
+    ppc64le) arch="ppc64le" ;;
     *)
       fail "Arch '$(uname -m)' not supported!"
       ;;
