@@ -67,11 +67,11 @@ get_download_url() {
   version="$1"
   platform=$(get_platform)
   arch=$(get_arch)
-  if ["$platform" == "darwin"] && [ "$arch" != "arm64" ]
-  then
-    bin_file="linkerd2-cli-stable-${version}-${platform}"
-  else
+
+  if [ "$platform" == "darwin" ] && [ "$arch" == "arm64" ]; then
     bin_file="linkerd2-cli-stable-${version}-${platform}-${arch}"
+  else
+    bin_file="linkerd2-cli-stable-${version}-${platform}"
   fi
 
   echo "$GH_REPO/releases/download/stable-${version}/${bin_file}"
