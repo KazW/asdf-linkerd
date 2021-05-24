@@ -6,15 +6,12 @@ Based on [this plugin](https://github.com/vaynerx/asdf-linkerd).
 # Dependencies
 
 - `bash`, `curl`, and `shasum` or `openssl`: generic POSIX utilities.
-- `SOME_ENV_VAR`: set this environment variable in your shell config to load the correct version of tool x.
 
 # Install
 
 Plugin:
 
 ```shell
-asdf plugin add linkerd
-# or
 asdf plugin add linkerd https://github.com/KazW/asdf-linkerd.git
 ```
 
