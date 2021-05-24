@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for linkerd.
 GH_REPO="https://github.com/linkerd/linkerd2"
 TOOL_NAME="linkerd"
 TOOL_TEST="linkerd --help"
@@ -14,7 +13,6 @@ fail() {
 
 curl_opts=(-fsSL)
 
-# NOTE: You might want to remove this if linkerd is not hosted on GitHub releases.
 if [ -n "${GITHUB_API_TOKEN:-}" ]; then
   curl_opts=("${curl_opts[@]}" -H "Authorization: token $GITHUB_API_TOKEN")
 fi
@@ -34,16 +32,84 @@ list_all_versions() {
   list_github_tags
 }
 
-download_release() {
-  local version filename url
+get_platform () {
+  local platform="$(uname | tr '[:upper:]' '[:lower:]')"
+
+  case "$platform" in
+    linux|darwin|freebsd) ;;
+    *)
+      fail "Platform '${platform}' not supported!"
+      ;;
+  esac
+
+  echo -n ${platform}
+}
+
+get_arch () {
+  local arch=""
+
+  case "$(uname -m)" in
+    x86_64|amd64) arch="amd64"; ;;
+    i686|i386) arch="386"; ;;
+    armv6l|armv7l) arch="armv6l"; ;;
+    aarch64) arch="arm64"; ;;
+    ppc64le) arch="ppc64le"; ;;
+    *)
+      fail "Arch '$(uname -m)' not supported!"
+      ;;
+  esac
+
+  echo -n $arch
+}
+
+get_download_url() {
+  local version platform arch bin_file
+  version="$1"
+  platform=$(get_platform)
+  arch=$(get_arch)
+  bin_file="linkerd2-cli-stable-${version}-${platform}-${arch}"
+
+  echo "$GH_REPO/releases/download/stable-${version}/${bin_file}"
+}
+
+checksumbin=$(command -v openssl) || checksumbin=$(command -v shasum) || {
+  fail "Failed to find checksum binary. Please install openssl or shasum."
+}
+
+validate_checksum() {
+  local filename version url SHA
   version="$1"
   filename="$2"
+  url=$(get_download_url $version)
 
-  # TODO: Adapt the release URL convention for linkerd
-  url="$GH_REPO/archive/v${version}.tar.gz"
+  echo -n "* Validating checksum... "
+  SHA=$(curl "${curl_opts[@]}" "${url}.sha256")
 
-  echo "* Downloading $TOOL_NAME release $version..."
+  case $checksumbin in
+    *openssl)
+      checksum=$($checksumbin dgst -sha256 "${filename}" | sed -e 's/^.* //')
+      ;;
+    *shasum)
+      checksum=$($checksumbin -a256 "${filename}" | sed -e 's/^.* //')
+      ;;
+  esac
+
+  if [ "$checksum" != "$SHA" ]; then
+    rm -f $filename
+    fail "Checksum validation failed!"
+  fi
+  echo "Passed!"
+}
+
+download_release() {
+  local version filename platform arch bin_file url
+  version="$1"
+  filename="$2"
+  url=$(get_download_url $version)
+
+  echo -n "* Downloading $TOOL_NAME release $version... "
   curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
+  echo "Done!"
 }
 
 install_version() {
@@ -56,13 +122,13 @@ install_version() {
   fi
 
   (
-    mkdir -p "$install_path"
-    cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
+    local bin_path="$install_path/bin"
+    local tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
 
-    # TODO: Asert linkerd executable exists.
-    local tool_cmd
-    tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
-    test -x "$install_path/bin/$tool_cmd" || fail "Expected $install_path/bin/$tool_cmd to be executable."
+    mkdir -p "$bin_path"
+    cp "$ASDF_DOWNLOAD_PATH/$TOOL_NAME-$version" "$bin_path/$tool_cmd"
+
+    test -x "$bin_path/$tool_cmd" || fail "Expected $bin_path/$tool_cmd to be executable."
 
     echo "$TOOL_NAME $version installation was successful!"
   ) || (

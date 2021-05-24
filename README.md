@@ -1,22 +1,11 @@
-<div align="center">
-
 # asdf-linkerd ![Build](https://github.com/KazW/asdf-linkerd/workflows/Build/badge.svg) ![Lint](https://github.com/KazW/asdf-linkerd/workflows/Lint/badge.svg)
 
 [linkerd](https://linkerd.io/2.10/reference/cli/) plugin for the [asdf version manager](https://asdf-vm.com).
-
-</div>
-
-# Contents
-
-- [Dependencies](#dependencies)
-- [Install](#install)
-- [Why?](#why)
-- [Contributing](#contributing)
-- [License](#license)
+Based on [this plugin](https://github.com/vaynerx/asdf-linkerd).
 
 # Dependencies
 
-- `bash`, `curl`, `tar`: generic POSIX utilities.
+- `bash`, `curl`, and `shasum` or `openssl`: generic POSIX utilities.
 - `SOME_ENV_VAR`: set this environment variable in your shell config to load the correct version of tool x.
 
 # Install
