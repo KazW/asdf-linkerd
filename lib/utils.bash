@@ -52,7 +52,7 @@ get_arch () {
     x86_64|amd64) arch="amd64"; ;;
     i686|i386) arch="386"; ;;
     armv6l|armv7l) arch="armv6l"; ;;
-    aarch64) arch="arm64"; ;;
+    aarch64|arm64) arch="arm64"; ;;
     ppc64le) arch="ppc64le"; ;;
     *)
       fail "Arch '$(uname -m)' not supported!"
@@ -67,7 +67,12 @@ get_download_url() {
   version="$1"
   platform=$(get_platform)
   arch=$(get_arch)
-  bin_file="linkerd2-cli-stable-${version}-${platform}-${arch}"
+  if ["$platform" == "darwin"] && [ "$arch" != "arm64" ]
+  then
+    bin_file="linkerd2-cli-stable-${version}-${platform}"
+  else
+    bin_file="linkerd2-cli-stable-${version}-${platform}-${arch}"
+  fi
 
   echo "$GH_REPO/releases/download/stable-${version}/${bin_file}"
 }
